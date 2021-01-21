@@ -12,7 +12,7 @@ public class WsTest {
     @ParameterizedTest
     @ValueSource(strings = { "FIL" })
     void testNotify(String x) throws URISyntaxException, InterruptedException {
-        WsClient ws = new WsClient("x-x-x-x", "x-x-x-4dc5b",
+        WsClient ws = new WsClient("x-x-x-x", "x-x-x-x",
                 "api.hbdm.com", "x", true);
 
         ws.Open("/notification", true);
