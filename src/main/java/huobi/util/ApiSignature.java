@@ -53,7 +53,7 @@ public class ApiSignature {
 	 *            the original parameters， save as Key-Value ，Don't encode Value
 	 */
 	public void createSignature(String accessKey, String secretKey, String method, String host, String uri,
-			Map<String, String> params) {
+			Map<String, Object> params) {
 		StringBuilder sb = new StringBuilder(1024);
 
 		// 1.请求方法 (GET or POST) 在后边加上`\n`.
@@ -76,10 +76,10 @@ public class ApiSignature {
 
 		// 按照上面的顺序，将每个参数与字符“&”连接。
 		// Following the sequence above, link each parameter and string with "&"
-		SortedMap<String, String> map = new TreeMap<String, String>(params);
-		for (Map.Entry<String, String> entry : map.entrySet()) {
+		SortedMap<String, Object> map = new TreeMap<String, Object>(params);
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
 			String key = entry.getKey();
-			String value = entry.getValue();
+			String value = entry.getValue().toString();
 			sb.append(key).append('=').append(urlEncode(value)).append('&');
 		}
 		// 删除最后的 `&`

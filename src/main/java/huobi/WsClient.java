@@ -30,7 +30,7 @@ public class WsClient {
 
     private String path;
     private boolean beAuth;
-    private Map<String, String> cmd = new HashMap<String, String>();
+    private Map<String, Object> cmd = new HashMap<String, Object>();
 
     public WsClient(String accessKey, String secretKey, String host, String cid, boolean autoReconnect) {
         this.accessKey = accessKey;
@@ -74,7 +74,7 @@ public class WsClient {
                         String ping = jdata.getString("ping");
                         if (ping != null && !ping.isEmpty()) {
 
-                            Map<String, String> map = new HashMap<String, String>();
+                            Map<String, Object> map = new HashMap<String, Object>();
                             map.put("pong", jdata.get("ping").toString());
                             _send(map);
                             return;
@@ -83,7 +83,7 @@ public class WsClient {
                         String op = jdata.getString("op");
                         if (op != null && !op.isEmpty()) {
                             if (op.equalsIgnoreCase("ping")) {
-                                Map<String, String> map = new HashMap<String, String>();
+                                Map<String, Object> map = new HashMap<String, Object>();
                                 map.put("op", "pong");
                                 map.put("ts", jdata.getString("ts"));
                                 _send(map);
@@ -111,6 +111,7 @@ public class WsClient {
                 public void onClose(int code, String reason, boolean remote) {
                     logger.error("onClose code:%d,reason:%s,remote:%s".formatted(code, reason, remote));
                     hasAuth = false;
+                    wsClient = null;
                     if (autoReconnect) {
                         reconnWs();
                     }
@@ -128,13 +129,13 @@ public class WsClient {
         }
     }
 
-    public void Send(Map<String, String> map) {
+    public void Send(Map<String, Object> map) {
         try {
             while (!hasAuth) {
                 Thread.sleep(10);
             }
             logger.info("send: " + _send(map));
-            cmd.putAll(map);;
+            cmd.putAll(map);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
@@ -145,7 +146,7 @@ public class WsClient {
         Send(this.cmd);
     }
 
-    private String _send(Map<String, String> map) {
+    private String _send(Map<String, Object> map) {
         String data = JSON.toJSONString(map);
         wsClient.send(data);
         return data;
@@ -155,7 +156,7 @@ public class WsClient {
         try {
             Thread.sleep(100);
 
-            Map<String, String> map = new HashMap<String, String>();
+            Map<String, Object> map = new HashMap<String, Object>();
             ApiSignature as = new ApiSignature();
             as.createSignature(accessKey, secretKey, "GET", host, path, map);
             map.put("type", "api");
